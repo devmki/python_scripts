@@ -14,6 +14,9 @@ import os
 latitude = 0.0  # Replace with your latitude
 longitude = 0.0 # Replace with your longitude
 
+# Define the path to the weather icons
+path_to_icons = 'your_path_to_weather_icons'  # Replace with the actual path to your weather icons
+
 
 days_dict = {
     'Monday':'Montag',
@@ -58,7 +61,7 @@ def display_weather_on_epaper():
 
     #get weather icons
     # Get weather icons for the next 4 hours (hour_now to hour_now + 3)
-    icons = weather.images_of_weather_icons(hourly_data.loc[hour_now:hour_now + timedelta(hours=3)])
+    icons = weather.images_of_weather_icons(path_to_icons,hourly_data.loc[hour_now:hour_now + timedelta(hours=3)])
 
     #take out trash?
     # Construct the relative path dynamically
