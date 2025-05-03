@@ -101,7 +101,7 @@ def display_weather_on_epaper():
         if hour in hourly_data.index:
             row = hourly_data.loc  [hour]
             draw.text((x_offset,40), f"{hour.strftime('%H:%M')}", font=font, fill=0)
-            image.paste(icons [int(hour.strftime('%H'))-1], (x_offset + 10, y_offset))
+            image.paste(icons [hour_offset], (x_offset + 10, y_offset))
             y_offset = 140
             for value in range(len(row)):
                 if value < len(row) - 2:
