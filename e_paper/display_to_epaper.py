@@ -66,7 +66,7 @@ def display_weather_on_epaper():
     #take out trash?
     # Construct the relative path dynamically
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    ics_file_path = os.path.join(script_dir, '../abfallkalender/abfallkalender2025.ics')
+    ics_file_path = os.path.join(script_dir, f'../abfallkalender/abfallkalender{day_now.year()}.ics')
     print('ics_file_path: ', ics_file_path)
     trash_days = read_abfall_ics.get_events_for_today_and_tomorrow(ics_file_path)
     if trash_days:
