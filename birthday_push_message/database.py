@@ -80,7 +80,6 @@ def delete_birthday_v2(name, date):
 def get_birthdays():
     """Fetch all birthday records from the database."""
     try:
-        print(DB_PATH)
         connection = sqlite3.connect(DB_PATH)
         cursor = connection.cursor()
         cursor.execute("SELECT * FROM birthdays")
