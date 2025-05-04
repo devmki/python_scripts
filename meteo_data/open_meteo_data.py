@@ -1,3 +1,8 @@
+"""
+Open-Meteo API client for weather data retrieval and processing.
+This module provides a class to interact
+with the Open-Meteo API, retrieve weather data, and process it into a structured format.
+"""
 import openmeteo_requests
 import requests_cache
 import pandas as pd
@@ -6,6 +11,9 @@ from PIL import Image
 
 
 class OpenMeteoWeather:
+    """
+    A class to interact with the Open-Meteo API for weather data retrieval.
+    """
     def __init__(self, latitude, longitude):
         # Setup the Open-Meteo API client with cache and retry on error
         cache_session = requests_cache.CachedSession('.cache', expire_after=3600)
@@ -72,11 +80,15 @@ class OpenMeteoWeather:
         self.longitude = longitude
 
     def get_weather_hourly(self):
+        """
+        Retrieve hourly weather data for the specified latitude and longitude.
+        """
         params = {
             "latitude": self.latitude,
             "longitude": self.longitude,
             "hourly": ["temperature_2m", "apparent_temperature", "relative_humidity_2m",
-                        "precipitation", "precipitation_probability", "uv_index", "weather_code", "is_day"],
+                        "precipitation", "precipitation_probability", "uv_index",
+                        "weather_code", "is_day"],
             "forecast_days": 1,
         }
         responses = self.openmeteo.weather_api(self.url, params=params)
@@ -105,10 +117,14 @@ class OpenMeteoWeather:
         return hourly_dataframe
 
     def get_weather_daily(self):
+        """
+        Retrieve daily weather data for the specified latitude and longitude.
+        """
         params = {
             "latitude": self.latitude,
             "longitude": self.longitude,
-            "daily": ["temperature_2m_min", "temperature_2m_max", "weather_code", "precipitation_sum"],
+            "daily": ["temperature_2m_min", "temperature_2m_max", 
+                      "weather_code", "precipitation_sum"],
             "forecast_days": 3,
         }
         responses = self.openmeteo.weather_api(self.url, params=params)
@@ -133,10 +149,13 @@ class OpenMeteoWeather:
         return daily_dataframe
 
     def get_icon(self, weather_code, is_day):
+        """
+        Get the icon number based on weather code and day/night status.
+        """
         iconnr = None
 
-        for key, value in self.weather_icons.items():            
-            if (isinstance(key[0], tuple)):
+        for key, value in self.weather_icons.items():
+            if isinstance(key[0], tuple):
                 # Check if weather_code is in the tuple
                 if weather_code in key[0] and is_day == key[1]:
                     iconnr = value
@@ -149,12 +168,19 @@ class OpenMeteoWeather:
         return iconnr
 
     def get_icon_url(self, weather_code, is_day):
+        """
+        Get the URL of the weather icon based on weather code and day/night status.
+        """
         iconnr = self.get_icon(weather_code, is_day)
         if iconnr:
             return f"https://openweathermap.org/img/wn/{iconnr}@2x.png"
         return None
 
     def images_of_weather_icons(self, path_to_icon_folder, weather_dataframe):
+        """
+        Get a list of images for the weather icons based on the weather dataframe.
+        """
+
         img_list = []
         for i, (index, row) in enumerate(weather_dataframe.iterrows()):
             weather_code = row['weather_code']
@@ -166,4 +192,3 @@ class OpenMeteoWeather:
             img_list.append(image)
 
         return img_list
-

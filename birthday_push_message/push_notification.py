@@ -1,3 +1,6 @@
+"""
+This module contains a function to send push notifications using Pushbullet.
+"""
 from pushbullet import Pushbullet
 
 def send_push_message(api_key, title, message):

@@ -1,21 +1,24 @@
+"""
+This script displays weather data, waste retrieval and birthdays 
+on an e-paper display using the Open Meteo API.
+"""
 import time
-import epaper
+import os
 from datetime import datetime, timedelta
 from PIL import Image, ImageDraw, ImageFont
-from meteo_data import open_meteo_data as omd
 import pytz
 import numpy as np
+import epaper
+from meteo_data import open_meteo_data as omd
 from birthday_push_message import scheduler as sh
 from abfallkalender import read_abfall_ics
-import os
-
 
 # Define values for latitude and longitude
-latitude = 0.0  # Replace with your latitude
-longitude = 0.0 # Replace with your longitude
+LATITUDE = 0.0  # Replace with your latitude
+LONGITUDE = 0.0 # Replace with your longitude
 
 # Define the path to the weather icons
-path_to_icons = 'your_path_to_weather_icons'  # Replace with the actual path to your weather icons
+PATH_TO_ICONS = 'your_path_to_weather_icons'  # Replace with the actual path to your weather icons
 
 # dicts and lists
 days_dict = {
@@ -30,15 +33,22 @@ days_dict = {
 
 units_list = ['[°C]', '[°C]', '[%]', '[mm]', '[%]', '[-]']
 
-measurements_list = ['Temperatur 2m', 'Temp. gefühlt', 'Luftfeuchte', 'Niederschlag', 'Probability', 'UV-Index']    
+measurements_list = ['Temperatur 2m', 'Temp. gefühlt', 'Luftfeuchte',
+                     'Niederschlag', 'Probability', 'UV-Index']    
 
 def draw_text_in_table_format(draw, text_list, x_start, y_start, x_offset, y_offset, font, fill=0):
+    """
+    Draws text in a table format on the image.
+    """
     for element in text_list:
         draw.text((x_start, y_start), element, font=font, fill=fill)
         x_start += x_offset
         y_start += y_offset
 
 def display_weather_on_epaper():
+    """
+    Main function to display weather data on the e-paper display.
+    """
     # Initialize the e-paper display
     epd = epaper.epaper('epd7in5_V2').EPD()
     epd.init()
@@ -53,11 +63,11 @@ def display_weather_on_epaper():
     font_small = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 18)
 
     # Fetch weather data
-    weather = omd.OpenMeteoWeather(latitude=latitude, longitude=longitude)
+    weather = omd.OpenMeteoWeather(latitude=LATITUDE, longitude=LONGITUDE)
 
     #hourly data
     hourly_data = weather.get_weather_hourly()
-    
+
     #daily data
     daily_data = weather.get_weather_daily()
 
@@ -71,11 +81,13 @@ def display_weather_on_epaper():
     day_after_tomorrow = day_now + timedelta(days=2)
 
     #current day
-    draw.text((10,10), f'{days_dict[day_now.strftime("%A")]}, {day_now.strftime("%d.%m.%Y")}', font=font, fill=0)
+    draw.text((10,10), f'{days_dict[day_now.strftime("%A")]}, {day_now.strftime("%d.%m.%Y")}',
+               font=font, fill=0)
 
     #get weather icons
     # Get weather icons for the next 4 hours (hour_now to hour_now + 3)
-    icons = weather.images_of_weather_icons(path_to_icons,hourly_data.loc[hour_now:hour_now + timedelta(hours=3)])
+    icons = weather.images_of_weather_icons(PATH_TO_ICONS,
+                                            hourly_data.loc[hour_now:hour_now + timedelta(hours=3)])
 
     #take out trash?
     # Construct the relative path dynamically
@@ -91,12 +103,14 @@ def display_weather_on_epaper():
 
     #display temmperature min/max of current day
     draw.text((10,70), 'Temp min/max', font=font, fill=0)
-    draw.text((230,70), f'{str(round(daily_data.iloc[0,0],1))} / {str(round(daily_data.iloc[0,1],1))}', font=font, fill=0)
+    draw.text((230,70),
+              f'{str(round(daily_data.iloc[0,0],1))} / {str(round(daily_data.iloc[0,1],1))}'
+              , font=font, fill=0)
 
     # Display the first few hours of weather data
     draw_text_in_table_format(draw, measurements_list, 10, 110, 0, 40, font)
     draw_text_in_table_format(draw, units_list, 250, 110, 0, 40, font)
-    
+
     x_offset = 375
     #hourly data
     for hour_offset in range(4):
@@ -115,9 +129,9 @@ def display_weather_on_epaper():
                         draw.text((x_offset + 10,y_offset), rounded_val, font = font, fill=0)
                     else:
                         draw.text((x_offset + 26,y_offset), rounded_val, font = font, fill=0)
-                    y_offset += 40                    
+                    y_offset += 40
             x_offset += 110
-            
+
     #display daily data
     draw.text((10,380), 'Temp min/max', font=font_small, fill=0)
     draw.text((10,400), 'N-Summe', font=font_small, fill=0)
@@ -142,7 +156,7 @@ def display_weather_on_epaper():
             str_vals = weather.weather_code_translations[row.iloc[2]].split(':')[0]
             draw.text((x_offset,y_offset), str_vals, font=font_small, fill=0)
             x_offset += 150
-            
+
 
     #birthday list:
     birthdays = sh.check_and_send_birthdays('nothing', mode='do_not_send')

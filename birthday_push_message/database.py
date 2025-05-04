@@ -1,3 +1,8 @@
+"""
+Module for managing a SQLite database of birthdays.
+This module provides functions to initialize the database, add, 
+edit, delete, and fetch birthday records.
+"""
 import sqlite3
 from datetime import datetime
 import csv

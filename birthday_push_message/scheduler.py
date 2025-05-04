@@ -1,9 +1,16 @@
+"""
+function to check the database for today's birthdays and send push messages
+or return a list of birthday messages
+"""
+
 from datetime import datetime
 from .database import get_birthdays, update_age_if_birthday
 from .push_notification import send_push_message
 
 def check_and_send_birthdays(api_key, mode='send'):
     """Check the database for today's birthdays and send push messages."""
+    # Update ages if today is a birthday
+    update_age_if_birthday()
     today = datetime.now().strftime("%d.%m.%Y")
     birthdays = get_birthdays()
     birthday_list = []
@@ -21,10 +28,10 @@ def check_and_send_birthdays(api_key, mode='send'):
                 appendage = 'nd'
             elif str(age).endswith('3'):
                 appendage = 'rd'
-                
+
             if appendage != '':
                 message = f"Today is {name}'s {age}{appendage} birthday!"
-            
+
             if mode == 'send':
                 send_push_message(api_key, "Birthday Reminder", message)
             else:

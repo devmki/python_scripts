@@ -1,8 +1,13 @@
+"""
+Birthday Manager GUI using Tkinter.
+This module provides a graphical user interface for managing birthday records,
+including adding, editing, deleting, and notifying about birthdays."""
+
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
-from .database import add_birthday, edit_birthday, delete_birthday, get_birthdays
 from datetime import datetime
+from .database import add_birthday, edit_birthday, delete_birthday, get_birthdays
 from .push_notification import send_push_message
 from .config import API_KEY
 
@@ -10,12 +15,14 @@ def refresh_table(tree):
     """Refresh the table with the current database records."""
     for row in tree.get_children():
         tree.delete(row)
-    for record in sorted(get_birthdays(), key=lambda x: (int(x[2].split('.')[1]), int(x[2].split('.')[0]))):
+    for record in sorted(get_birthdays(), key=lambda x: (int(x[2].split('.')[1]),
+                                                          int(x[2].split('.')[0]))):
         tree.insert("", "end", values=record)
     style_rows(tree)
 
 # Apply alternating row colors
 def style_rows(tree):
+    """Apply alternating row colors to the treeview."""
     for i, row in enumerate(tree.get_children()):
         if i % 2 == 0:
             tree.item(row, tags=("even",))
@@ -55,10 +62,11 @@ def add_record(name_entry, date_entry, age_entry, tree):
         messagebox.showerror("Error", "All fields are required!")
 
 # Global variable to track the previous selection
-previous_selection = None
+PREVIOUS_SELECTION = None
 
-def on_record_select(event, name_entry, date_entry, age_entry, tree):
-    global previous_selection
+def on_record_select(name_entry, date_entry, age_entry, tree):
+    """Handle record selection in the treeview."""
+    global PREVIOUS_SELECTION
 
     # Get the current selection
     current_selection = tree.selection()
@@ -66,13 +74,13 @@ def on_record_select(event, name_entry, date_entry, age_entry, tree):
     # Check if the selection is empty (deselection)
     if not current_selection:
         print("Deselection occurred")
-        previous_selection = None
+        PREVIOUS_SELECTION = None
         return
 
     # Check if the selection has changed
-    if current_selection != previous_selection:
+    if current_selection != PREVIOUS_SELECTION:
         print("Selection occurred")
-        previous_selection = current_selection
+        PREVIOUS_SELECTION = current_selection
 
         # Populate the input fields with the selected record
         selected_item = current_selection[0]
@@ -128,7 +136,7 @@ def delete_record(tree):
         print("E4")
         messagebox.showerror("Error", "No record selected!")
 
-def notify_now(api_key, listbox):
+def notify_now(api_key):
     """Send a push message immediately if there is a birthday today."""
     today = datetime.now().strftime("%d.%m.")  # Only day and month are needed
     birthdays = get_birthdays()
@@ -191,7 +199,9 @@ def open_edit_window(tree):
                 messagebox.showerror("Error", "All fields are required!")
 
         # Save button
-        tk.Button(edit_window, text="Save", command=save_changes).grid(row=3, column=0, columnspan=2)
+        tk.Button(edit_window, text="Save", command=save_changes).grid(row=3,
+                                                                       column=0,
+                                                                       columnspan=2)
 
     except IndexError:
         print("E5")
@@ -246,13 +256,16 @@ def create_gui():
     refresh_table(tree)
 
     # Bind the selection event to update input fields
-    tree.bind("<<TreeviewSelect>>", lambda event: on_record_select(event, name_entry, date_entry, age_entry, tree))
+    tree.bind("<<TreeviewSelect>>", lambda event: on_record_select(name_entry,
+                                                                   date_entry, age_entry, tree))
 
     # Buttons
-    tk.Button(root, text="Add", command=lambda: add_record(name_entry, date_entry, age_entry, tree)).grid(row=4, column=0)
-    tk.Button(root, text="Edit", command=lambda: edit_record(name_entry, date_entry, age_entry, tree)).grid(row=4, column=1)
+    tk.Button(root, text="Add", command=lambda: add_record(name_entry, date_entry,
+                                                           age_entry, tree)).grid(row=4, column=0)
+    tk.Button(root, text="Edit", command=lambda: edit_record(name_entry, date_entry,
+                                                           age_entry, tree)).grid(row=4, column=1)
     tk.Button(root, text="Delete", command=lambda: delete_record(tree)).grid(row=4, column=2)
-    tk.Button(root, text="Notify Now", command=lambda: notify_now(API_KEY, tree)).grid(row=5, column=0)
+    tk.Button(root, text="Notify Now", command=lambda: notify_now(API_KEY)).grid(row=5, column=0)
     tk.Button(root, text="Exit", command=root.quit).grid(row=5, column=1)
 
     root.mainloop()
