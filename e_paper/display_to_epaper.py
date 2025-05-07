@@ -96,10 +96,10 @@ def display_weather_on_epaper():
     trash_days = read_abfall_ics.get_events_for_today_and_tomorrow(ics_file_path)
     if trash_days:
         for trash_day in trash_days:
-            if trash_day['start'].date() == day_now.date():
-                draw.text((180, 10), f'Heute: {trash_day["summary"]}', font=font, fill=0)
-            elif trash_day['start'].date() == tomorrow.date():
-                draw.text((300, 10), f'Morgen: {trash_day["summary"]}', font=font, fill=0)
+            if trash_day['start'] == day_now.date():
+                draw.text((500, 400), f'Heute: {trash_day["summary"]}', font=font_small, fill=0)
+            elif trash_day['start'] == tomorrow.date():
+                draw.text((500, 420), f'Morgen: {trash_day["summary"]}', font=font_small, fill=0)
 
     #display temmperature min/max of current day
     draw.text((10,70), 'Temp min/max', font=font, fill=0)
@@ -161,7 +161,7 @@ def display_weather_on_epaper():
     #birthday list:
     birthdays = sh.check_and_send_birthdays('nothing', mode='do_not_send')
     if birthdays:
-        x_offset = 425
+        x_offset = 500
         y_offset = 360
         for birthday in birthdays:
             draw.text((x_offset,y_offset), birthday, font = font_small, fill=0)

@@ -26,7 +26,6 @@ def get_events_for_today_and_tomorrow(ics_file_path):
                 summary = component.get('SUMMARY').to_ical().decode('utf-8')
                 # Filter summary to keep only specific keywords
                 for keyword in ["Papier", "Restmüll", "Biomüll", "Gelber Sack"]:
-                    print (f"Checking for keyword: {keyword} in summary: {summary}")
                     if keyword in summary:
                         events.append({
                             'summary': keyword,
