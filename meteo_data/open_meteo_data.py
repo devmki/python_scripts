@@ -48,8 +48,8 @@ class OpenMeteoWeather:
             85: "Snow showers: Slight intensity",
             86: "Snow showers: Heavy intensity",
             95: "Thunderstorm: Slight or moderate",
-            96: "Thunderstorm with slight hail",
-            99: "Thunderstorm with heavy hail"
+            96: "Thunderstorm: with slight hail",
+            99: "Thunderstorm: with heavy hail"
         }
 
         # Dictionary to map is_day and weather descriptions to icons
