@@ -165,7 +165,7 @@ def display_weather_on_epaper():
     #birthday list:
     birthdays = sh.check_and_send_birthdays('nothing', mode='do_not_send')
     if birthdays:
-        x_offset = 500
+        x_offset = 470
         y_offset = 340
         for birthday in birthdays:
             draw.text((x_offset,y_offset), birthday, font = font_small, fill=0)
